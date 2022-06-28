@@ -19,9 +19,9 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module bicubic_interpolation_top(
     input [15:0] pixels_in,
+    input [3:0] scale,
     output [15:0] pixels_out,
     input clk,
     input en
