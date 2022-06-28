@@ -23,6 +23,7 @@
 
 module fill_all_blocks(
     input [15:0] in [783:0],
+    input clock,
     output [15:0] out [(28*scale)**2-55*scale**2-1]
     );
     
