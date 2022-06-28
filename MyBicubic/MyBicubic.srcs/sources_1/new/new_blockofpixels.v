@@ -21,7 +21,7 @@
 
 
 module new_blockofpixels(
-    input [15:0] in [15:0]
+    input [15:0] in [15:0],
     output [15:0] out[((scale-1)**2):0]
     );
     
@@ -36,10 +36,19 @@ module new_blockofpixels(
     
     reg [15:0] out_i;
     reg [7:0] row, col;
+    integer new_pixel_i;
+    
+    new_pixel new_pixel[scale*scale-1:0](
+        .in(in),
+        .a(a[out_i]), 
+        .b(b[out_i]),
+        .out(out[out_i])
+    );
     
     initial begin
-        diff = 1/scale; //set diff instead of 
-        out_i=0;
+        assign diff = 1/scale; //set diff instead of 
+        assign out_i=0;
+        assign new_pixel_i = 0;
         
         for (row = 0; row <= (scale - 1); row = row+1)  begin     
             for (col = 0; col <= (scale - 1); col = col+1) begin
@@ -51,7 +60,7 @@ module new_blockofpixels(
     end
 
 
-    always@()begin
+    always @* begin
         for (row = 0; row <= (scale - 1); row = row+1) begin
             for (col = 0; col <= (scale - 1); col = col+1) begin
                 
@@ -60,13 +69,14 @@ module new_blockofpixels(
                 else begin
                     a[out_i] = distance[out_i][row][col][0];
                     b[out_i] = distance[out_i][row][col][1];
-                    module new_pixel(
+                    new_pixel new_pixel[new_pixel_i](
                         .in(in),
                         .a(a[out_i]), 
                         .b(b[out_i]),
                         .out(out[out_i])
                     );
-                end
+                    assign new_pixel_i = new_pixel_i+1;
+                end;
                 
                 out_i = out_i+1;
             end
