@@ -52,9 +52,10 @@ module fill_all_blocks_28rolled(
     ); 
 
     always @(posedge clock) begin
-        case (block_rowl)
+        case (block_rowl)        
         for (block_row=0; block_row<=27*scale; block_row = block_row+scale)begin
-        block_row:  for (block_col=0; block_col<=27*scale; block_col = block_col+scale)begin
+        block_row:  begin
+                    for (block_col=0; block_col<=27*scale; block_col = block_col+scale)begin
                         assign block_in[0] = in_2d[block_row][block_col];
                         assign block_in[1] = in_2d[block_row][block_col+1];
                         assign block_in[2] = in_2d[block_row][block_col+2];
@@ -77,12 +78,18 @@ module fill_all_blocks_28rolled(
                         
                         new_blockofpixels new_blockofpixels[new_blockofpixels_i](
                             .in(block_in),
-                            .out(out)
+                            .out(out)//need to write parameterised length of  array concatnation ip
                         ); 
-                        assign new_blockofpixels_i= new_blockofpixels_i+1; 
+                         
                     end
+                assign new_blockofpixels_i= new_blockofpixels_i+1;
+                end
         end
-        default: block_row=>0;
+
+        default: begin
+            block_row=0;
+            assign new_blockofpixels_i= 0;
+            end
         endcase
 
    end
