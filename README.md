@@ -1,44 +1,22 @@
-# Quantisation (Wenlin Yi)
-<font size = 4>
-Quantisation is applied to the original EPSCN Tensorflow code. There are two quantisation methodes compared to non-quantised model: Quantisation Aware Training(QAT) and post-training quantisation. The different quantised word lengths and data types are also tested. And for the QAT, quantisation on different layers/combination of layers are compared with their peak signal-noise ratio.
+# Bicubic interpolation (Wenlin Yi)
+20ns 50MHz
 
-## Key Libraries
+## Generating a new pixel depending on the distance to nearest existing pixels
 
-<font size = 12>
+The new pixel is generated given the distance from input pixel 5. The distance between two adjacent pixels is one, and the algorithms is given at: https://uk.mathworks.com/matlabcentral/answers/405846-bicubic-interpolation-direct-interpolation-formula-matlab-source-code
 
-- **QAT library:** tensorflow-model-optimization, tempfile
+<img src="generating_new_pixel.png" alt="generating_new_pixel" width="400"/>
+In this way, it allow us fit this algorithm to any enlarge scales, all the new pixels will having a multiple of 1/scale x and y distance to input pixel 5. And to customise the enlarge scale, input the 1/scale parameter to the top level ip, otherwise in the testing, its default value set by local parameter of x3. float 16 multiplier is added in hope to accelerate the calculation further.
 
-- **Post-training quantisation library:** tf.lite.TFLiteConverter.from_keras_model, logging, pathlib
+## Generating a block of new pixels for one inputs' gap
 
-## Models
-<font size = 12>
-  
-- **Baseline model:**
-  ![image](https://user-images.githubusercontent.com/46746329/176867098-9ba7fbba-2832-4a4e-a83e-c9fcedb2728b.png)
+This block uses the above module to generate all the new pixels in a top-left block between the input 5, 6, 9, 10, to fill all the gap in the wantted enlarge scale. To generate a top-left block allows all the block gerenated inlay well.
+<img src="generating_block.png" alt="generating_block" width="400"/>
 
-- **QAT models:**
-  - quantise whole model:
-    This would not work due to the change of dimention of tfmot.quantization.keras.quantize_model(base_model) 
-  ![image](https://user-images.githubusercontent.com/46746329/176866920-c959b04e-236e-49aa-adb8-a2095c545637.png)
+## Padding the inputs
 
-  - quantise layers:
-  ![image](https://user-images.githubusercontent.com/46746329/176866857-ec82b45f-f0dc-4c32-a99c-866922e957b2.png)
+At edges of the image, there is not enough pixels (16 pixels) to perform the algothm, therefore, the image is padded by 1, and padding value is taking the nearest neighbour value.
 
-  
-- **Post training quantised model:**
-  ![image](https://user-images.githubusercontent.com/46746329/176866814-c8dfffcb-6872-45ad-b10b-cdc02e211d2a.png)
+## Fill all the blocks(unrolled and 28rolled)
 
-
-## Performances
-<font size = 12>
-    (random seed:1337)
-  
-- **Performance Metric:**
-  Sometime different run returns different average psnr, therefore I took two examples of them.
-  ![image](https://user-images.githubusercontent.com/46746329/176866095-6c0a73df-68df-4344-b92c-4b739f244eb2.png)
-  The inference time is sample from the last test image of this random seed. It suggest that quantise the two/one layers before interpolation layer gives the best time/accuracy balance.
-  
-- **Training Performance Graph:**
-  ![5baef6e1b81e86919c17a93808c944e](https://user-images.githubusercontent.com/46746329/176866241-9ea1946e-528b-4706-84dd-735394488c56.png)
-
-
+In this module, it takes the inputs as a 1d bus array and then tranfor into a 2d array. Then add padding to the 2d inputs. In the unrolled version, it generated 28*28, 783 generating_blockpixels module in total and aim to generating all of the new pixels in parallel in 1 clock cycle. In the 28rolled version, It uses one generating_blockpixels model for each row of blocks of pixels in parallel, aiming to spend 28 clock cycles to produce a row of blcoks of pixels, and all 28 rows are running inparallel.
