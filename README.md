@@ -1,5 +1,6 @@
 # Bicubic interpolation (Wenlin Yi)
 20ns 50MHz
+In the ESPCN python code, one of the key feature is it's interpolation and pixels shuffle layer library tf.nn.depth_to_space, the interpolation layer convolute with all channels use tf.nn.depth_to_space to convert into a spacial domain. Due to the complexity and time constrain, ```layers.Conv2D(channels * (upscale_factor**2), 3, **conv_args)``` in hardware is replaced with bicubic interpolation instead. Although bicubic interpolation does not involve any training, but it calculate pixels of new information and is more accurate than linear or nearest neighbour interpolation, and commonly used in industry. 
 
 ## Generating a new pixel depending on the distance to nearest existing pixels
 
