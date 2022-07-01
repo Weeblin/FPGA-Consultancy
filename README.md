@@ -1,72 +1,22 @@
-# ARM 15：Hardware Accelerated ML for Embedded Devices
+# Bicubic interpolation (Wenlin Yi)
+20ns 50MHz
 
-<font size = 4>
-  
-This project aims to introduce an extension to the TensorFlow library to use hardware accelerators defined on FPGAs using the PYNQ framework from Xilinx. The intention here is that we are proposing the use of FPGAs to allow any accelerator to be loaded onto our embedded device and cater towards application specific needs.
+## Generating a new pixel depending on the distance to nearest existing pixels
 
-</font>
+The new pixel is generated given the distance from input pixel 5. The distance between two adjacent pixels is one, and the algorithms is given at: https://uk.mathworks.com/matlabcentral/answers/405846-bicubic-interpolation-direct-interpolation-formula-matlab-source-code
 
-## Application: Super Resolution (SuperRes)
+<img src="generating_new_pixel.png" alt="generating_new_pixel" width="400"/>
+In this way, it allow us fit this algorithm to any enlarge scales, all the new pixels will having a multiple of 1/scale x and y distance to input pixel 5. And to customise the enlarge scale, input the 1/scale parameter to the top level ip, otherwise in the testing, its default value set by local parameter of x3. float 16 multiplier is added in hope to accelerate the calculation further.
 
-<font size = 4>
-  
-**Motivation:** With the advancement in machine learning techniques in recent years, machine learning algorithm based super resolution has been actively explored. Super resolution imaging is a technique that enhances the resolution of an image or video. In addition to enhancing image quality, we want to minimize the execution time of the upscaling algorithm, this is where FPGA comes into play. Since FPGAs are good for intensive data computation and static parallel tasks, it provides a faster approach for image processing. 
-  
-More information about Super Resolution methods can be found [here](https://github.com/Terrortorpe/FPGA-Consultancy/blob/clean/Super_Resolution_Methods/README.md).
-  
-</font>
+## Generating a block of new pixels for one inputs' gap
 
-## Requirements
- 
-- TensorFlow
-- Numpy
-- PYNQ Z1 board
+This block uses the above module to generate all the new pixels in a top-left block between the input 5, 6, 9, 10, to fill all the gap in the wantted enlarge scale. To generate a top-left block allows all the block gerenated inlay well.
+<img src="generating_block.png" alt="generating_block" width="400"/>
 
-## Software
+## Padding the inputs
 
-<font size = 4>
-  
-More information about software can be found [here](https://github.com/Terrortorpe/FPGA-Consultancy/blob/clean/Super_Resolution_Models/README.md).
-  
-</font>
+At edges of the image, there is not enough pixels (16 pixels) to perform the algothm, therefore, the image is padded by 1, and padding value is taking the nearest neighbour value.
 
-## Hardware 
+## Fill all the blocks(unrolled and 28rolled)
 
-<font size = 4>
-  
-More information about custom IPs can be found [here](https://github.com/Terrortorpe/FPGA-Consultancy/blob/clean/Super_Resolution_Hardware_IPs/README.md).
-  
-</font>
-
-
-## Connection between Software and Hardware
-
-<font size = 4>
-  
-More information about data flow between FPGA and CPU can be found [here](https://github.com/Terrortorpe/FPGA-Consultancy/blob/clean/Super_Resolution_Connection/README.md).
-  
-</font>
-
-## Camera and display
-
-<font size = 4>
-  
-More information about data flow between FPGA and CPU can be found [here](https://github.com/Terrortorpe/FPGA-Consultancy/tree/clean/Super_Resolution_Display).
-  
-</font>
-
-
-
-## References
-<font size = 2>
-  
-[1]**"Super Resolution in OpenCV"**, Lipi Patnaik, Vardan Agarwal [[website]](https://learnopencv.com/super-resolution-in-opencv/)
-
-[2]**"TF-ESPCN"**,fannymonori [[Github]](https://github.com/fannymonori/TF-ESPCN)
-
-[3]**"DSP for FPGA: Custom AXI4-Stream FIR filter IP in Vivado"** , Whitney Knitter [[website]](https://www.hackster.io/whitney-knitter/dsp-for-fpga-custom-axi4-stream-fir-filter-ip-in-vivado-0d4a39)
-  
-[4]**"An Overview of ESPCN: An Efficient Sub-pixel Convolutional Neural Network"** , zhuo Cen [[website]](https://medium.com/@zhuocen93/an-overview-of-espcn-an-efficient-sub-pixel-convolutional-neural-network-b76d0a6c875e#:~:text=ESPCN%20can%20be%20seen%20as,the%20last%20pixel%20shuffle%20stage.)
-  
-  
-</font>
+In this module, it takes the inputs as a 1d bus array and then tranfor into a 2d array. Then add padding to the 2d inputs. In the unrolled version, it generated 28*28, 783 generating_blockpixels module in total and aim to generating all of the new pixels in parallel in 1 clock cycle. In the 28rolled version, It uses one generating_blockpixels model for each row of blocks of pixels in parallel, aiming to spend 28 clock cycles to produce a row of blcoks of pixels, and all 28 rows are running inparallel.
