@@ -19,4 +19,4 @@ At edges of the image, there is not enough pixels (16 pixels) to perform the alg
 
 ## Fill all the blocks(unrolled and 28rolled)
 
-In this module, it takes the inputs as a 1d bus array and then tranfor into a 2d array. Then add padding to the 2d inputs. In the unrolled version, it geenrated 28*28, 783 generating_blockpixels module in total and aim to generating all of the new pixels in parallel in 1 clock cycle. In the 28rolled version, It uses one generating_blockpixels model for each row of blocks of pixels in parallel, aiming to spend 28 clock cycles to produce a row of blcoks of pixels, and all 28 rows are running inparallel.
+In this module, it takes the inputs as a 1d bus array and then tranfor into a 2d array. Then add padding to the 2d inputs. In the unrolled version, it generated 28*28, 783 generating_blockpixels module in total and aim to generating all of the new pixels in parallel in 1 clock cycle. In the 28rolled version, It uses one generating_blockpixels model for each row of blocks of pixels in parallel, aiming to spend 28 clock cycles to produce a row of blcoks of pixels, and all 28 rows are running inparallel.
