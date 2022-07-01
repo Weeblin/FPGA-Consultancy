@@ -1,0 +1,6 @@
+verilog xil_defaultlib  \
+"../../../../MyBicubic.gen/sources_1/ip/float16_divide/sim/float16_divide.v" \
+
+verilog xil_defaultlib "glbl.v"
+
+nosort
