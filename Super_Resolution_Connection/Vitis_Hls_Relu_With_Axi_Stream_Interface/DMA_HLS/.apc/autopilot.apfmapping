@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="example.cpp" path="/home/e2/shared/Vitis-HLS-Introductory-Examples-2021.2/Interface/Streaming/using_axi_stream_with_side_channel_data/example.cpp"/>
+  </source>
+  <testbench>
+    <originFiles name="example_test.cpp" path="/home/e2/shared/Vitis-HLS-Introductory-Examples-2021.2/Interface/Streaming/using_axi_stream_with_side_channel_data/example_test.cpp"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>
