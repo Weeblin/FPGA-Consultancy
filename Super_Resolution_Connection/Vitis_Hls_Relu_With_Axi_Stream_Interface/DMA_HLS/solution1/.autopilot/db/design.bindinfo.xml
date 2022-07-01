@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BindInfo>
+	<BindNode BINDTYPE="op" DISPLAY="bind_op select" ID="" IMPL="auto_sel" LATENCY="0" OPTYPE="select" PRAGMA="" RTLNAME="tmp_data_V_fu_159_p3" SOURCE="../shared/Vitis-HLS-Introductory-Examples-2021.2/Interface/Streaming/using_axi_stream_with_side_channel_data/example.cpp:32" VARIABLE="tmp_data_V" MODULE="example" LOOP="VITIS_LOOP_29_1" BUNDLEDNAME="" DSP="0" BRAM="0" URAM="0"/>
+	<BindNode BINDTYPE="adapter" DISPLAY="bind_adapter axilite" ID="" IMPL="" LATENCY="" OPTYPE="" PRAGMA="yes" RTLNAME="control_s_axi_U" SOURCE="" VARIABLE="" MODULE="example" LOOP="" BUNDLEDNAME="control" DSP="0" BRAM="0" URAM="0"/>
+</BindInfo>
